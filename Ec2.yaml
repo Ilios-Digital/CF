@@ -34,7 +34,7 @@ Resources:
       GroupDescription: Enable HTTP (80) and SSH (22) access
       GroupName: WebServer-SG
       VpcId: 
-        Fn::ImportValue: !Sub "${VPCStackName}-VPCID" # Reference VPC ID from VPC Stack
+        Fn::ImportValue: !Sub "${VPCStackName}-MyVPC-VPCID" # Reference VPC ID from VPC Stack
       SecurityGroupIngress:
         # Allow HTTP
         - IpProtocol: tcp
@@ -73,7 +73,7 @@ Resources:
     Properties:
       InstanceType: !Ref InstanceType
       SubnetId: 
-        Fn::ImportValue: !Sub "${VPCStackName}-SUBNET"
+        Fn::ImportValue: !Sub "${VPCStackName}-PublicSUBNET"
       SecurityGroupIds:
         - !Ref mySG
       KeyName: !Ref KeyPairName
