@@ -68,10 +68,10 @@ Resources:
       SecurityGroupIds:
         - !Ref mySG
       BlockDeviceMappings:
-        - DeviceName: "/dev/xvda"
+        - DeviceName: "/dev/sda1"
           Ebs:
-            VolumeSize: 20            # Root volume size in GB
-            VolumeType: gp2           # General Purpose SSD
+            VolumeSize: 10            # Root volume size in GB
+            VolumeType: gp3           # General Purpose SSD
             DeleteOnTermination: true # Automatically delete the volume when the instance is terminated
       Tags:
         - Key: Name
