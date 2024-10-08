@@ -2,6 +2,7 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: 
   VPC with public and private subnets, Internet Gateway, and NAT Gateway for access to the internet.
 
+# Updated
 Parameters:
   VPCStackName:
     Description: Name of the VPC stack
