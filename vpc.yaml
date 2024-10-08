@@ -7,7 +7,7 @@ Parameters:
   VPCStackName:
     Description: Name of the VPC stack
     Type: String
-    Default: vpc
+    Default: test
   VPCCidr:
     Description: CIDR block for the VPC
     Type: String
