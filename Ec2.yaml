@@ -1,9 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 Description: 
   Sample template to provision an EC2 Instance with public IP, Elastic IP (EIP), and root EBS volume.
-  You will be billed for the AWS resources used if you create a stack from this template.
 
-# Get the name of the base stack which is created first and has VPC details
 Parameters:
   VPCStackName:
     Description: Name of the VPC stack
@@ -27,21 +25,18 @@ Parameters:
     Default: ami-0866a3c8686eaeeba # Defaults to Amazon Linux in us-east-1 region
 
 Resources:
-  # Security Group for the EC2 instance
   mySG:
     Type: AWS::EC2::SecurityGroup
     Properties: 
       GroupDescription: Enable HTTP (80) and SSH (22) access
       GroupName: WebServer-SG
       VpcId: 
-        Fn::ImportValue: !Sub "${VPCStackName}-MyVPC-VPCID" # Reference VPC ID from VPC Stack
+        Fn::ImportValue: !Sub "${VPCStackName}-VPCID" # Reference VPC ID from VPC Stack
       SecurityGroupIngress:
-        # Allow HTTP
         - IpProtocol: tcp
           FromPort: '80'
           ToPort: '80'
           CidrIp: 0.0.0.0/0 # Open to all IPs for HTTP
-        # Allow SSH
         - IpProtocol: tcp
           FromPort: '22'
           ToPort: '22'
@@ -53,7 +48,6 @@ Resources:
           Value: 
             Ref: "AWS::StackName"
   
-  # Allow local traffic within the security group
   SGBaseIngress:
     Type: AWS::EC2::SecurityGroupIngress
     Properties:
@@ -63,64 +57,33 @@ Resources:
       ToPort: '-1'
       SourceSecurityGroupId: !Ref mySG
 
-  # Elastic IP (EIP) for the instance
-  MyElasticIP:
-    Type: AWS::EC2::EIP
-
-  # EC2 instance with Elastic IP, root volume (EBS), and web server installation
-  EC2Instance:
-    Type: 'AWS::EC2::Instance'
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
     Properties:
+      ImageId: !Ref InstanceImageId
       InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPairName
       SubnetId: 
-        Fn::ImportValue: !Sub "${VPCStackName}-PublicSUBNET"
+        Fn::ImportValue: !Sub "${VPCStackName}-PublicSubnetID" # Corrected reference
       SecurityGroupIds:
         - !Ref mySG
-      KeyName: !Ref KeyPairName
-      ImageId: !Ref InstanceImageId
+      Tags:
+        - Key: Name
+          Value: !Sub "${VPCStackName}-Instance"
       UserData: 
-        Fn::Base64: |
-          #!/bin/bash -xe
+        Fn::Base64: !Sub |
+          #!/bin/bash
           yum update -y
           yum install -y httpd
           systemctl start httpd
           systemctl enable httpd
-          echo "Hello World from EC2" > /var/www/html/index.html
+          echo "<h1>Hello from $(hostname -f)</h1>" > /var/www/html/index.html
 
-      # Define root volume (EBS)
-      BlockDeviceMappings:
-        - DeviceName: /dev/xvda  # Default root device
-          Ebs:
-            VolumeSize: 10         # Set size of root volume in GB
-            VolumeType: gp3        # General Purpose SSD
-            DeleteOnTermination: true # Delete root volume on termination
-            
-      Tags: 
-        - Key: Name
-          Value: demo-ec2
-        - Key: Application
-          Value: 
-            Ref: "AWS::StackName"
-  
-  # Associate Elastic IP with the EC2 instance
-  EIPAssociation:
-    Type: AWS::EC2::EIPAssociation
-    Properties:
-      InstanceId: !Ref EC2Instance
-      EIP: !Ref MyElasticIP
-
-# Output the important values for easy viewing in the CloudFormation dashboard
 Outputs:
-  InstanceId:
-    Description: InstanceId of the EC2 instance
-    Value: !Ref EC2Instance
-  
-  PublicDNS:
-    Description: Public DNS Name of the EC2 instance
-    Value: !GetAtt 
-      - EC2Instance
-      - PublicDnsName
-      
-  PublicIP:
-    Description: Elastic IP address associated with the EC2 instance
-    Value: !Ref MyElasticIP
+  PublicInstanceID:
+    Description: EC2 Instance ID
+    Value: !Ref MyEC2Instance
+
+  PublicInstanceIP:
+    Description: Public IP of the instance
+    Value: !GetAtt MyEC2Instance.PublicIp
