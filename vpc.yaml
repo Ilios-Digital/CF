@@ -3,6 +3,10 @@ Description:
   VPC with public and private subnets, Internet Gateway, and NAT Gateway for access to the internet.
 
 Parameters:
+  VPCStackName:
+    Description: Name of the VPC stack
+    Type: String
+    Default: vpc
   VPCCidr:
     Description: CIDR block for the VPC
     Type: String
@@ -34,7 +38,7 @@ Resources:
       EnableDnsHostnames: true
       Tags:
         - Key: Name
-          Value: MyVPC
+          Value: !Sub "${VPCStackName}-MyVPC"
 
   # Internet Gateway
   MyInternetGateway:
@@ -42,7 +46,7 @@ Resources:
     Properties: 
       Tags:
         - Key: Name
-          Value: MyInternetGateway
+          Value: !Sub "${VPCStackName}-MyInternetGateway"
 
   # Attach the Internet Gateway to the VPC
   AttachGateway:
@@ -61,7 +65,7 @@ Resources:
       AvailabilityZone: !Ref AvailabilityZone1
       Tags:
         - Key: Name
-          Value: PublicSubnet
+          Value: !Sub "${VPCStackName}-PublicSubnet"
 
   # Private Subnet
   PrivateSubnet:
@@ -72,7 +76,7 @@ Resources:
       AvailabilityZone: !Ref AvailabilityZone2
       Tags:
         - Key: Name
-          Value: PrivateSubnet
+          Value: !Sub "${VPCStackName}-PrivateSubnet"
 
   # Public Route Table
   PublicRouteTable:
@@ -81,7 +85,7 @@ Resources:
       VpcId: !Ref MyVPC
       Tags:
         - Key: Name
-          Value: PublicRouteTable
+          Value: !Sub "${VPCStackName}-PublicRouteTable"
 
   # Route for Internet Gateway (public access)
   PublicRoute:
@@ -112,7 +116,7 @@ Resources:
   #     AllocationId: !GetAtt MyNatGatewayEIP.AllocationId
   #     Tags:
   #       - Key: Name
-  #         Value: MyNatGateway
+  #         Value: !Sub "${VPCStackName}-MyNatGateway"
 
   # # Private Route Table
   # PrivateRouteTable:
@@ -121,7 +125,7 @@ Resources:
   #     VpcId: !Ref MyVPC
   #     Tags:
   #       - Key: Name
-  #         Value: PrivateRouteTable
+  #         Value: !Sub "${VPCStackName}-PrivateRouteTable"
 
   # # Route for NAT Gateway (Private Subnet access to the internet)
   # PrivateRoute:
@@ -143,16 +147,16 @@ Outputs:
     Description: VPC ID
     Value: !Ref MyVPC
     Export:
-      Name: !Sub "${AWS::StackName}-VPCID"
+      Name: !Sub "${VPCStackName}-VPCID"
 
   PublicSubnetID:
     Description: Public Subnet ID
     Value: !Ref PublicSubnet
     Export:
-      Name: !Sub "${AWS::StackName}-PUBLIC-SUBNET"
+      Name: !Sub "${VPCStackName}-PUBLIC-SUBNET"
 
   PrivateSubnetID:
     Description: Private Subnet ID
     Value: !Ref PrivateSubnet
     Export:
-      Name: !Sub "${AWS::StackName}-PRIVATE-SUBNET"
+      Name: !Sub "${VPCStackName}-PRIVATE-SUBNET"

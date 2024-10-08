@@ -6,15 +6,14 @@ Description:
 # Get the name of the base stack which is created first and has VPC details
 Parameters:
   VPCStackName:
-    Description: VPC
+    Description: Name of the VPC stack
     Type: String
     Default: vpc
-    
+  
   KeyPairName:
     Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
     Type: 'AWS::EC2::KeyPair::KeyName'
     ConstraintDescription: Must be the name of an existing EC2 KeyPair.
-    Default: test
   
   InstanceType:
     Description: EC2 instance type
@@ -47,11 +46,11 @@ Resources:
           ToPort: '22'
           CidrIp: 0.0.0.0/0 # Open to all IPs for demo purposes, restrict for production
       Tags: 
-       - Key: Name
-         Value: demo-sg
-       - Key: Application
-         Value: 
-           Ref: "AWS::StackName"
+        - Key: Name
+          Value: demo-sg
+        - Key: Application
+          Value: 
+            Ref: "AWS::StackName"
   
   # Allow local traffic within the security group
   SGBaseIngress:
@@ -96,11 +95,11 @@ Resources:
             DeleteOnTermination: true # Delete root volume on termination
             
       Tags: 
-       - Key: Name
-         Value: demo-ec2
-       - Key: Application
-         Value: 
-           Ref: "AWS::StackName"
+        - Key: Name
+          Value: demo-ec2
+        - Key: Application
+          Value: 
+            Ref: "AWS::StackName"
   
   # Associate Elastic IP with the EC2 instance
   EIPAssociation:
