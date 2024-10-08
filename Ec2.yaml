@@ -23,7 +23,7 @@ Parameters:
   InstanceImageId:
     Description: EC2 Image ID for the region
     Type: AWS::EC2::Image::Id
-    Default: ami-0a8b4cd432b1c3063 # Defaults to Amazon Linux in us-east-1 region
+    Default: ami-0866a3c8686eaeeba # Defaults to Amazon Linux in us-east-1 region
 
 Resources:
   # Security Group for the EC2 instance
